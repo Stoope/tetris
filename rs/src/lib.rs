@@ -31,10 +31,56 @@ pub struct Board {
     cells: Vec<Cell>,
 }
 
+impl Board {
+    fn get_index(&self, row: u32, column: u32) -> usize {
+        (row * self.width + column) as usize
+    }
+
+    pub fn get_cells(&self) -> &[Cell] {
+        &self.cells
+    }
+}
+
+#[wasm_bindgen]
+impl Board {
+    pub fn new(width: u32, height: u32) -> Board {
+        let cells = vec![Cell::None; (width * height) as usize];
+
+        Board {
+            width,
+            height,
+            cells,
+        }
+    }
+
+    pub fn get_width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn get_height(&self) -> u32 {
+        self.height
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use super::*;
+
     #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
+    fn should_init_board() {
+        let board = Board::new(2, 4);
+        assert_eq!(board.get_cells(), [Cell::None; 8]);
+    }
+
+    #[test]
+    fn should_get_width() {
+        let board = Board::new(5, 10);
+        assert_eq!(board.get_width(), 5);
+    }
+
+    #[test]
+    fn should_get_height() {
+        let board = Board::new(5, 10);
+        assert_eq!(board.get_height(), 10);
     }
 }
