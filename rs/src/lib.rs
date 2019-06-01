@@ -83,4 +83,16 @@ mod tests {
         let board = Board::new(5, 10);
         assert_eq!(board.get_height(), 10);
     }
+
+    #[test]
+    fn should_get_index_0_3() {
+        let board = Board::new(5, 10);
+        assert_eq!(board.get_index(0, 3), 3);
+    }
+
+    #[test]
+    fn should_get_index_3_4() {
+        let board = Board::new(5, 10);
+        assert_eq!(board.get_index(3, 4), 19);
+    }
 }
