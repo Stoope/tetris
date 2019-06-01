@@ -39,6 +39,10 @@ impl Board {
     pub fn get_cells(&self) -> &[Cell] {
         &self.cells
     }
+
+    pub fn check_row_is_full(&self, row: u32) -> bool {
+        !self.cells[self.get_index(row, 0)..self.get_index(row, self.width)].iter().any(|&item| item == Cell::None)
+    }
 }
 
 #[wasm_bindgen]
@@ -94,5 +98,25 @@ mod tests {
     fn should_get_index_3_4() {
         let board = Board::new(5, 10);
         assert_eq!(board.get_index(3, 4), 19);
+    }
+
+    #[test]
+    fn should_check_row_is_full_true() {
+        let board = Board {
+            width: 4,
+            height: 2,
+            cells: vec![Cell::None,Cell::None,Cell::None,Cell::TBlock,Cell::None,Cell::None,Cell::JBlock,Cell::None,]
+        };
+        assert_eq!(board.check_row_is_full(1), false);
+    }
+
+    #[test]
+    fn should_check_row_is_full_false() {
+        let board = Board {
+            width: 4,
+            height: 2,
+            cells: vec![Cell::IBlock,Cell::JBlock,Cell::LBlock,Cell::TBlock,Cell::None,Cell::None,Cell::JBlock,Cell::None,]
+        };
+        assert_eq!(board.check_row_is_full(0), true);
     }
 }
