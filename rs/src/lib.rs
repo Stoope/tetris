@@ -15,12 +15,25 @@ fn set_panic_hook() {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Cell {
     None = 0,
+    // ----
     IBlock = 1,
+    // -
+    // ---
     JBlock = 2,
+    //   -
+    // ---
     LBlock = 3,
+    // --
+    // --
     OBlock = 4,
+    //  --
+    // --
     SBlock = 5,
+    //  -
+    // ---
     TBlock = 6,
+    // --
+    //  --
     ZBlock = 7,
 }
 
@@ -41,7 +54,9 @@ impl Board {
     }
 
     pub fn check_row_is_full(&self, row: u32) -> bool {
-        !self.cells[self.get_index(row, 0)..self.get_index(row, self.width)].iter().any(|&item| item == Cell::None)
+        !self.cells[self.get_index(row, 0)..self.get_index(row, self.width)]
+            .iter()
+            .any(|&item| item == Cell::None)
     }
 }
 
@@ -105,7 +120,16 @@ mod tests {
         let board = Board {
             width: 4,
             height: 2,
-            cells: vec![Cell::None,Cell::None,Cell::None,Cell::TBlock,Cell::None,Cell::None,Cell::JBlock,Cell::None,]
+            cells: vec![
+                Cell::None,
+                Cell::None,
+                Cell::None,
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+            ],
         };
         assert_eq!(board.check_row_is_full(1), false);
     }
@@ -115,7 +139,16 @@ mod tests {
         let board = Board {
             width: 4,
             height: 2,
-            cells: vec![Cell::IBlock,Cell::JBlock,Cell::LBlock,Cell::TBlock,Cell::None,Cell::None,Cell::JBlock,Cell::None,]
+            cells: vec![
+                Cell::IBlock,
+                Cell::JBlock,
+                Cell::LBlock,
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+            ],
         };
         assert_eq!(board.check_row_is_full(0), true);
     }
