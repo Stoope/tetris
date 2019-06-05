@@ -58,6 +58,20 @@ impl Board {
             .iter()
             .any(|&item| item == Cell::None)
     }
+
+    pub fn remove_and_shift_row(&mut self, row: u32) {
+        for current_row in (1..=row).rev() {
+            for current_column in 0..self.width {
+                let index = self.get_index(current_row, current_column);
+                let index_above = self.get_index(current_row.wrapping_sub(1), current_column);
+                self.cells[index] = self.cells[index_above];
+            }
+        }
+        for current_column in 0..self.width {
+            let index = self.get_index(0, current_column);
+            self.cells[index] = Cell::None;
+        }
+    }
 }
 
 #[wasm_bindgen]
@@ -151,5 +165,107 @@ mod tests {
             ],
         };
         assert_eq!(board.check_row_is_full(0), true);
+    }
+
+    #[test]
+    fn should_remove_and_shift_row_1() {
+        let mut board = Board {
+            width: 3,
+            height: 3,
+            cells: vec![
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+                Cell::None,
+                Cell::IBlock,
+                Cell::JBlock,
+                Cell::LBlock,
+            ],
+        };
+        board.remove_and_shift_row(2);
+        assert_eq!(
+            board.get_cells(),
+            [
+                Cell::None,
+                Cell::None,
+                Cell::None,
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+                Cell::None,
+            ],
+        );
+    }
+
+    #[test]
+    fn should_remove_and_shift_row_2() {
+        let mut board = Board {
+            width: 3,
+            height: 3,
+            cells: vec![
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::IBlock,
+                Cell::JBlock,
+                Cell::LBlock,
+                Cell::JBlock,
+                Cell::None,
+                Cell::None,
+            ],
+        };
+        board.remove_and_shift_row(1);
+        assert_eq!(
+            board.get_cells(),
+            [
+                Cell::None,
+                Cell::None,
+                Cell::None,
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+                Cell::None,
+            ],
+        );
+    }
+
+    #[test]
+    fn should_remove_and_shift_row_3() {
+        let mut board = Board {
+            width: 3,
+            height: 3,
+            cells: vec![
+                Cell::IBlock,
+                Cell::JBlock,
+                Cell::LBlock,
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+                Cell::None,
+            ],
+        };
+        board.remove_and_shift_row(0);
+        assert_eq!(
+            board.get_cells(),
+            [
+                Cell::None,
+                Cell::None,
+                Cell::None,
+                Cell::TBlock,
+                Cell::None,
+                Cell::None,
+                Cell::JBlock,
+                Cell::None,
+                Cell::None,
+            ],
+        );
     }
 }
