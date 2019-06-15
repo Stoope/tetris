@@ -4,7 +4,8 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
   ([{ Board, Cell }, { memory }]) => {
     class Game {
       context: CanvasRenderingContext2D | null;
-      moveDelay: number;
+      tickDelay: number;
+      tickTimerId?: number;
       board: Board;
       width: number;
       height: number;
@@ -25,9 +26,15 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
         canvas.width =
           this.width * this.cellSize + (this.width + this.borderSize);
 
-        this.moveDelay = 1000;
-        this.drawGrid();
-        this.drawBoard();
+        this.tickDelay = 1000;
+        this.tick();
+      }
+      tick() {
+        this.tickTimerId = window.setTimeout(() => {
+          this.drawGrid();
+          this.drawBoard();
+          this.tick();
+        }, this.tickDelay);
       }
       drawGrid() {
         if (this.context == null) return;
