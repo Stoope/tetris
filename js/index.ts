@@ -1,7 +1,7 @@
 import { Board } from "../rs/pkg/tetris";
 
 Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
-  ([{ Board }, { memory }]) => {
+  ([{ Board, Cell }, { memory }]) => {
     class Game {
       context: CanvasRenderingContext2D | null;
       moveDelay: number;
@@ -27,6 +27,7 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
 
         this.moveDelay = 1000;
         this.drawGrid();
+        this.drawBoard();
       }
       drawGrid() {
         if (this.context == null) return;
@@ -51,9 +52,63 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
 
         this.context.stroke();
       }
+      drawBoard() {
+        if (this.context == null) return;
+
+        const cellsPtr = this.board.cells();
+        const cells = new Uint8Array(
+          memory.buffer,
+          cellsPtr,
+          this.width * this.height
+        );
+
+        this.context.beginPath();
+
+        for (let row = 0; row < this.width; row += 1) {
+          for (let column = 0; column < this.height; column += 1) {
+            const index = row * this.width + column;
+            const cell = cells[index];
+            const x = row * (this.cellSize + this.borderSize) + 1;
+            const y = column * (this.cellSize + this.borderSize) + 1;
+            this.context.moveTo(x, y);
+            if (cell !== Cell.None) {
+              switch (cell) {
+                case Cell.IBlock:
+                  this.context.fillStyle = "#00ffff";
+                  break;
+                case Cell.JBlock:
+                  this.context.fillStyle = "#0000ff";
+                  break;
+                case Cell.LBlock:
+                  this.context.fillStyle = "#ffaa00";
+                  break;
+                case Cell.OBlock:
+                  this.context.fillStyle = "#ffff00";
+                  break;
+                case Cell.SBlock:
+                  this.context.fillStyle = "#00ff00";
+                  break;
+                case Cell.TBlock:
+                  this.context.fillStyle = "#9900ff";
+                  break;
+                case Cell.ZBlock:
+                  this.context.fillStyle = "#ff0000";
+                  break;
+                default:
+                  this.context.fillStyle = "#ffffff";
+                  break;
+              }
+              this.context.fillRect(x, y, this.cellSize, this.cellSize);
+            }
+          }
+        }
+
+        this.context.stroke();
+      }
     }
 
     const game = new Game(10, 25, 25);
+
     console.log(memory);
   }
 );
