@@ -38,6 +38,16 @@ pub enum Cell {
 }
 
 #[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Action {
+    Left = 0,
+    Right = 1,
+    Rotate = 2,
+    Down = 3,
+}
+
+#[wasm_bindgen]
 pub struct Board {
     width: u32,
     height: u32,
@@ -77,7 +87,7 @@ impl Board {
 #[wasm_bindgen]
 impl Board {
     pub fn new(width: u32, height: u32) -> Board {
-        let cells = vec![Cell::None; (width * height) as usize];
+        let cells = vec![Cell::LBlock; (width * height) as usize];
 
         Board {
             width,
@@ -92,6 +102,22 @@ impl Board {
 
     pub fn get_height(&self) -> u32 {
         self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.get_cells().as_ptr()
+    }
+
+    pub fn tick(&mut self) {
+        for current_row in 0..self.height {
+            if self.check_row_is_full(current_row) {
+                self.remove_and_shift_row(current_row);
+            }
+        }
+    }
+
+    pub fn action(&self, action: Action) {
+        
     }
 }
 

@@ -1,7 +1,7 @@
 import { Board } from "../rs/pkg/tetris";
 
 Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
-  ([{ Board, Cell }, { memory }]) => {
+  ([{ Board, Cell, Action }, { memory }]) => {
     class Game {
       context: CanvasRenderingContext2D | null;
       tickDelay: number;
@@ -27,11 +27,35 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
           this.width * this.cellSize + (this.width + this.borderSize);
 
         this.tickDelay = 1000;
+
+        document.addEventListener("keydown", (event: KeyboardEvent) => {
+          let action;
+          switch (event.key) {
+            case "ArrowDown":
+              action = Action.Down;
+              break;
+            case "ArrowUp":
+              action = Action.Rotate;
+              break;
+            case "ArrowLeft":
+              action = Action.Left;
+              break;
+            case "ArrowRight":
+              action = Action.Right;
+              break;
+            default:
+              return;
+          }
+          this.board.action(action);
+          this.drawBoard();
+        });
+      }
+      start() {
         this.tick();
       }
       tick() {
         this.tickTimerId = window.setTimeout(() => {
-          this.drawGrid();
+          this.board.tick();
           this.drawBoard();
           this.tick();
         }, this.tickDelay);
@@ -61,6 +85,7 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
       }
       drawBoard() {
         if (this.context == null) return;
+        this.drawGrid();
 
         const cellsPtr = this.board.cells();
         const cells = new Uint8Array(
@@ -115,7 +140,6 @@ Promise.all([import("../rs/pkg/tetris"), import("../rs/pkg/tetris_bg")]).then(
     }
 
     const game = new Game(10, 25, 25);
-
-    console.log(memory);
+    game.start();
   }
 );
